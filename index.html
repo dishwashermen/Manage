@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+		<meta name="robots" content="ALL" />
+		
+		<meta name="description" content="" />
+		
+		<meta name="keywords" content="" />
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+		
+		<meta http-equiv="Cache-Control" content="no-cache">
+		
+        <link rel="icon" type="image/png" sizes="32x32" href="Public/Favicon/favicon-32x32.png">
+        
+        <link rel="icon" type="image/png" sizes="16x16" href="Public/Favicon/favicon-16x16.png">
+		
+		<link rel="stylesheet" href="Public/Css/Style.css">
+		
+		<link rel="stylesheet" href="Public/Css/StyleLogin.css">
+
+		<script src="Public/Js/Script.js"></script>
+				
+		<title>hotRESEARCH</title>
+
+	</head>
+
+	<body>
+	
+		<div id="LoginPage" class="login-container">
+		
+			<h2 class="login-caption">hotRESEARCH</h2>
+			
+			<div id="Login" class="input-box">
+			
+				<input type="" name="" required="">
+				
+				<label>Логин</label>
+			
+			</div>
+			
+			<div id="LoginSubmit" class="login-submit">Вход</div>
+		
+		</div>
+
+		<table class="main-container">
+		
+			<tr>
+			
+				<td class="main-menu">
+		
+		<div id="LeftContainer" class="left-container hidden">
+		
+			<details id="ProjectList" class="project-list" open>
+			
+				<summary class="project-name">
+				
+					<div class="caption">Проект</div>
+			
+					<div class="content">Все доступные</div>
+				
+				</summary>
+
+			</details>
+			
+			<table id="ReportContainer" class="report-container">
+			
+				<tr id="Report" class="report" data-active data-index="0" onclick="listener(event)">
+
+					<td class="caption">Всего</td>
+			
+					<td class="content">0</td>
+					
+					<td id="Download" class="download"></td>
+					
+					<td class="arrow"></td>
+
+				</tr>
+				
+				<tr id="Report" class="report" data-index="3" onclick="listener(event)">
+				
+					<td class="caption">Завершён</td>
+			
+					<td class="content">0</td>
+					
+					<td id="Download" class="download"></td>
+					
+					<td class="arrow"></td>
+				
+				</tr>
+				
+				<tr id="Report" class="report" data-index="2" onclick="listener(event)">
+				
+					<td class="caption">В процессе</td>
+			
+					<td class="content">0</td>
+					
+					<td id="Download" class="download"></td>
+					
+					<td class="arrow"></td>
+				
+				</tr>
+				
+				<tr id="Report" class="report" data-index="1" onclick="listener(event)">
+				
+					<td class="caption">Авторизован</td>
+			
+					<td class="content">0</td>
+					
+					<td id="Download" class="download"></td>
+					
+					<td class="arrow"></td>
+				
+				</tr>
+				
+				<tr id="Report" class="report" data-index="4" onclick="listener(event)">
+				
+					<td class="caption">Прерван (скрин)</td>
+			
+					<td class="content">0</td>
+					
+					<td id="Download" class="download"></td>
+					
+					<td class="arrow"></td>
+				
+				</tr>
+				
+				<tr id="Report" class="report" data-index="5" onclick="listener(event)">
+				
+					<td class="caption">Прерван (лимит)</td>
+			
+					<td class="content">0</td>
+					
+					<td id="Download" class="download"></td>
+					
+					<td class="arrow"></td>
+				
+				</tr>
+			
+			</table>
+			
+			<div id="FilterContainer"></div>
+
+		</div>
+		
+				</td>
+				
+				<td class="main-divider"></td>
+				
+				<td class="main-data">
+		
+		<div class="right-container hidden"></div>
+
+				</td>
+				
+			</tr>
+			
+		</table>
+
+		<details id="FilterTemplate" class="hidden">
+		
+			<summary class="filter-name">
+			
+				<table class="filter-name-table">
+				
+					<tr>
+					
+						<td class="caption"></td>
+						
+						<td id="FilterAction" class="filter-action" rowspan="2">
+						
+							<div class="wrap">
+						
+								<div id="check-part-1" class="check-sign"></div>
+							
+								<div id="check-part-2" class="check-sign"></div>
+								
+							</div>
+						
+						</td>
+
+					</tr>
+					
+					<tr>
+					
+						<td class="content">Все доступные</td>
+					
+					</tr>
+				
+				</table>
+
+			</summary>
+			
+			<div id="Filter" class="filter">
+			
+				<span class="filter-name-container">Все доступные</span>
+				
+				<span class="limit-container"></span>
+				
+			</div>
+
+		</details>
+
+		<table id="UserTemplate" class="hidden">
+		
+			<thead>
+			
+				<tr id="WorkCaption">
+
+					<th id="UserCaption" class="user-caption" data-sort-name="LoginData" data-sort-type="string">Логин</th>
+					
+					<th id="UserCaption" class="user-caption" data-sort-name="TimeStamp" data-sort-type="string">Дата</th>
+					
+					<th id="UserCaption" class="user-caption" data-sort-name="UserAgent" data-sort-type="string">Устройство</th>
+					
+					<th id="UserCaption" class="user-caption" data-sort-name="Status" data-sort-type="string">Статус</th>
+					
+					<th id="UserCaption" class="user-caption" data-sort-name="StateIndex" data-sort-type="number">№</th>
+				
+				</tr>
+				
+			</thead>
+			
+			<tbody>
+			
+				<tr id="UserStringTemplate" class="hidden" onmousedown="return false">
+
+					<td id="LoginData" class="user-content"></td>
+					
+					<td id="DateTime" class="user-content"></td>
+					
+					<td id="UserAgent" class="user-content"></td>
+					
+					<td id="Status" class="user-content"></td>
+					
+					<td id="StateIndex" class="user-content"></td>
+				
+				</tr>
+				
+			</tbody>
+			
+		</table>
+		
+		<table class="hidden">
+		
+			<tr id="UserBoxTemplate">
+			
+				<td class="user-box-td">
+				
+					<table class="user-box-table">
+					
+						<tr>
+						
+							<td class="user-box-id"></td>
+							
+							<td id="UserList" class="user-box-button">Анкета</td>
+							
+							<td id="UserLog" class="user-box-button">Лог</td>
+							
+							<td id="UserDelete" class="user-box-button">Удалить</td>
+							
+							<td class="user-box-filler"></td>
+						
+						</tr>
+					
+					</table>
+				
+				</td>
+			
+			</tr>
+		
+		</table>
+
+	</body>
+	
+</html>
