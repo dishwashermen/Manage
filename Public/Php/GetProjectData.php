@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ProjectId']) && is_nu
 	
 	$DBQ = new DBWORKER($dbu['host'], 'koksarea_hot' . $_POST['ProjectId'], 'utf8', $dbu['user'], $dbu['pass']);
 
-	$ViewData = $DBQ -> prep('SELECT * FROM `vscheme`') -> fetchAll(PDO :: FETCH_ASSOC);
+	$ViewData = $DBQ -> prep('SELECT * FROM `scheme_users`') -> fetchAll(PDO :: FETCH_ASSOC);
 
 	$SendArray = array('Action' => 'Project data', 'ProjectId' => $_POST['ProjectId'], 'ViewData' => $ViewData);
 	
@@ -24,23 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ProjectId']) && is_nu
 		
 	}
 	
-	if (Preg_match('/file/', $_POST['AuthType'])) {
+	// if ($_POST['AuthType'] == 'base') {
 
-		$fileName = '../../../ONLINE/FileData/data_' . $_POST['ProjectId'];
-					
-		$FileData = null;
+		// $BaseData = GetbaseData($_POST['AuthData']);
 		
-		if (file_exists($fileName)) {
-						
-			$lines = file($fileName, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-			$FileData = GetFileData($lines);
+		// $SendArray['BaseData'] = $BaseData;
 		
-		}
-		
-		$SendArray['FileData'] = $FileData;
-
-	}
+	// }
 		
 	echo json_encode($SendArray);
 		

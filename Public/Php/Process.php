@@ -1,40 +1,28 @@
 <?php
 
-function GetFileData($data) {
+function GetBaseData($data) {
 	
-	$in_data = array();
-				
-	$in_data_index = 0;
+	global $DBQ;
 	
-	foreach ($data as $lkey => $lval) {
-		
-		$ldata = explode(';', $lval); 
-		
-		foreach ($ldata as $ldata_key => $ldata_value) {
-		
-			if ($lkey != 0) {
-					
-				if ($lkey > 1 && $ldata_key == 0) {
-					
-					if (! in_array($ldata_value, $in_data[$ldata_key]['fieldData'][$in_data_index])) {
-				
-						$in_data_index ++;
-						
-						array_push($in_data[$ldata_key]['fieldData'], array($ldata_value));
-						
-						if (count($ldata) > 1) for ($i = 1; $i < count($ldata); $i ++) array_push($in_data[$ldata_key + $i]['fieldData'], array());
-				
-					}
-					
-				} else array_push($in_data[$ldata_key]['fieldData'][$in_data_index], $ldata_value);
+	$BaseData = $DBQ -> prep('SELECT `Auth_1`' . ($data == 2 ? ', `Auth_2`' : '') . ' FROM `scheme_authorization`') -> fetchAll(PDO :: FETCH_NUM);
+	
+	$Result = array('FieldName' => array(), 'FieldData' => array());
 
-			} else array_push($in_data, array('fieldName' => $ldata_value, 'fieldData' => array(array())));
-			
-		} 
-			
-	}
+	foreach ($BaseData as $Key => $Val) if ($Key > 0) {
+
+		if (! array_key_exists($Val[0], $Result['FieldData'])) $Result['FieldData'][$Val[0]] = array();
 	
-	return $in_data;
+		if ($data == 2) array_push($Result['FieldData'][$Val[0]], $Val[1]);
+
+	} else {
+				
+		$Result['FieldName'][0] = $Val[0];
+				
+		if ($data == 2) $Result['FieldName'][1] = $Val[1];
+				
+	}
+
+	return $Result;
 	
 }
 

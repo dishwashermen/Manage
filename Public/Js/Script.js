@@ -4,8 +4,6 @@ let CURRENTUSER = {};
 
 let DIFFERENCE;
 
-let FILEDATA = {};
-
 let FILTER = {};
 
 let FILTERLIMIT = {};
@@ -21,8 +19,6 @@ let PROJECTID = 0;
 let PROJECT = {};
 
 let PROJECTS = {};
-
-let REGTYPE;
 
 let REPORTSTATUS = {0: 0};
 
@@ -178,13 +174,9 @@ let sendRequest = {
 								PROJECTID = + RESPONSE.ProjectId;
 							
 								PROJECT = PROJECTS[PROJECTID];
-								
-								REGTYPE = PROJECT.AuthType.match(/(?<type>^[^\[]+)\[?(?<data>[^\]]+)?\]?(?<mode>.+$)?/);
-								
+
 								VIEWDATA = RESPONSE.ViewData;
-								
-								FILEDATA = RESPONSE.FileData;
-								
+
 								LIMITDATA = RESPONSE.LimitData;
 
 								VIEWSTRUCTURE = [];
@@ -499,6 +491,8 @@ function listener(e) {
 					
 					FD.append('AuthType', PROJECTS[el.dataset.project].AuthType);
 					
+					FD.append('AuthData', PROJECTS[el.dataset.project].AuthData);
+					
 					FD.append('Limiting', PROJECTS[el.dataset.project].Limiting);
 	
 					sendRequest.Send('Public/Php/GetProjectData.php', FD);
@@ -527,11 +521,9 @@ function listener(e) {
 
 					if (Object.keys(WORKFILTER).length) for (let f in WORKFILTER) FilterQuery += '&' + WORKFILTER[f][0] + '=' + WORKFILTER[f][2];
 					
-					let ExtFileData = [];
-					
-					if (FILEDATA != null && FILEDATA.length) for (let fd = REGTYPE.groups.data; fd < FILEDATA.length; fd ++) ExtFileData.push(FILEDATA[fd].fieldName);
+					let ExtBaseData = [];
 
-					window.location = 'Public/Php/DownloadReport.php?p=' + PROJECTID + '&s=' + Parent.dataset.index + (JF ? '&jf=' + JF + '&jl=' + JL + '&jc=' + JC : '') + (ExtFileData.length ? '&ef=' + ExtFileData.join('*') : '') + FilterQuery;
+					window.location = 'Public/Php/DownloadReport.php?p=' + PROJECTID + '&s=' + Parent.dataset.index + (JF ? '&jf=' + JF + '&jl=' + JL + '&jc=' + JC : '') + ('&at=' + PROJECT.AuthType) + FilterQuery;
 							
 				break;
 				

@@ -38,25 +38,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && count($_GET) >= 2 && isset($_GET['p'
 	
 	$Offset = 2;
 	
-	if (isset($_GET['ef'])) {
+	$IsBaseData = false;
+	
+	// Вытаскиваем дополнительные поля в шапку ----------------------------------------------------------------------------------
+	
+	if (isset($_GET['at']) && $_GET['at'] == 'base') {
+			
+		$BaseData = $DBQ -> prep('SELECT * FROM `scheme_authorization` WHERE `Id` = 1') -> fetch(PDO :: FETCH_ASSOC);
 		
-		$RegEF = explode('*', $_GET['ef']);
-		
-		foreach ($RegEF as $RAV) {
+		if (isset($BaseData['Data_1'])) {
 			
-			$RowName[$RAV] = 'string';
+			$IsBaseData = true;
 			
-			array_push($RowCol, '');
+			foreach($BaseData as $Key => $Val) {
 			
-			array_push($RowRow, '');
-			
-			array_push($RowNum, '');
-			
-			$Offset ++;
+				if (! Preg_match('/Id|Auth_1|Auth_2/', $Key)) {
+					
+					$RowName[$Val] = 'string';
+					
+					array_push($RowCol, '');
+					
+					array_push($RowRow, '');
+					
+					array_push($RowNum, '');
+					
+					$Offset ++;
+					
+				}
+				
+			}
 			
 		}
-		
+			
 	}
+	
+	// --------------------------------------------------------------------------------------------------------------------------
 	
 	$QN = Array();
 
@@ -90,13 +106,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && count($_GET) >= 2 && isset($_GET['p'
 		
 	$Filter = Array();
 
-	foreach ($_GET as $key => $val) if (! Preg_match('/^p$|^s$|^jf$|^jl$|^jc$|^ef$/', $key)) $Filter[$key] = $val;
-	
-	$a = array('prid' => $_GET['p']);
-	
-	if ($_GET['s'] > 0) $a['Status'] = $_GET['s'];
+	foreach ($_GET as $key => $val) if (! Preg_match('/^p$|^s$|^jf$|^jl$|^jc$|^at$/', $key)) $Filter[$key] = $val;
 
-	$Users = $DB -> prep('SELECT `id`, `data1`, `TimeStamp` FROM `users` WHERE `prid` = :prid' . ($_GET['s'] > 0 ? ' AND `Status` = :Status' : ''), $a) -> fetchAll(PDO :: FETCH_ASSOC);
+	$Users = $DBQ -> prep('SELECT `Id`, `LoginData`, `TimeStamp` FROM `scheme_users` WHERE ' . ($_GET['s'] > 0 ? '`Status` = :Status' : '`Status` IS NOT NULL'), array('Status' => $_GET['s'])) -> fetchAll(PDO :: FETCH_ASSOC);
 	
 	$Project = $DB -> prep('SELECT * FROM `projects` WHERE `id` = :prid', array('prid' => $_GET['p'])) -> fetch(PDO :: FETCH_ASSOC);
 	
@@ -104,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && count($_GET) >= 2 && isset($_GET['p'
 		
 		if ($Project['Version'] == 'Online') {
 		
-			$UserData = $DBQ -> prep('SELECT `QName`, `QResponse` FROM `u' . $UV['id'] . '` ORDER BY `Journal`, `QSI`') -> fetchAll(PDO :: FETCH_ASSOC);
+			$UserData = $DBQ -> prep('SELECT `QName`, `QResponse` FROM `u' . $UV['Id'] . '` ORDER BY `Journal`, `QSI`') -> fetchAll(PDO :: FETCH_ASSOC);
 
 			$UD = Array();
 			
@@ -120,9 +132,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && count($_GET) >= 2 && isset($_GET['p'
 		
 			}
 
-			$RowUserData = array($UV['TimeStamp'], $UV['data1']);
+			$RowUserData = array($UV['TimeStamp'], $UV['LoginData']);
+
+			// Заполнение дополнительных полей ----------------------------------------------------------------------------------
 			
-			if (isset($_GET['ef'])) foreach ($RegEF as $RAV) array_push($RowUserData, (isset($UD[$RAV]) ? $UD[$RAV] : ''));
+			if ($IsBaseData) {
+				
+				$UserBaseData = $DBQ -> prep('SELECT * FROM `scheme_authorization` WHERE `Id` = ' . $UV['Id']) -> fetch(PDO :: FETCH_ASSOC);
+
+				foreach($UserBaseData as $Key => $Val) if (! Preg_match('/Id|Auth_1|Auth_2/', $Key)) array_push($RowUserData, (isset($Val) ? $Val : ''));
+
+			}
+			
+			// ------------------------------------------------------------------------------------------------------------------
 
 			foreach ($QN as $QNV) array_push($RowUserData, (isset($UD[$QNV]) ? $UD[$QNV] : ''));
 
