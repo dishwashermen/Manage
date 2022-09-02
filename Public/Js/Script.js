@@ -703,7 +703,7 @@ function listener(e) {
 
 							let Exclude = false;
 							
-							for (let i in FILTERSTRING) if (! x[i].includes(FILTERSTRING[i])) {
+							for (let i in FILTERSTRING) if (x[i] == null || ! x[i].includes(FILTERSTRING[i])) {
 									
 								Exclude = true;
 									
