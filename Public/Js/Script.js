@@ -651,9 +651,13 @@ function listener(e) {
 
 					[].forEach.call(SELECTION, function(x) {
 						
-						if (! Options.includes(x[StringFilterName])) Options.push(x[StringFilterName]);
+						if (! Options.includes(x[StringFilterName])) {
+							
+							Options.push(x[StringFilterName]);
 						
-						Filter.querySelector('datalist').append(elem('option', {textcontent: x[StringFilterName]}));
+							Filter.querySelector('datalist').append(elem('option', {textcontent: x[StringFilterName]}));
+							
+						}
 						
 					});
 
