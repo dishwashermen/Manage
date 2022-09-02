@@ -1,110 +1,88 @@
-var dialogData = {
+let dialogData = {
 	
-	'button_resume': {
+	'AuthError': {
 		
-		trueButtonText: 'ДА',
+		DialogType: 'confirm',
+		
+		TrueButtonText: '',
 				
-		falseButtonText: 'НЕТ',
+		FalseButtonText: '',
 				
-		questionText: 'Анкета заполнена и готова к отправке.<p>Хотите изменить анкету?</p>'
+		TitleText: 'Не заполнены или некорректно заполнены данные для авторизации'
 		
 	},
 	
-	'canCreate': {
+	'LoginError': {
 		
-		trueButtonText: '',
-				
-		falseButtonText: '',
-				
-		questionText: 'В данном проекте, запись разговора с респондентом будет включена автоматически в момент открытия анкеты.'
+		DialogType: 'confirm',
 		
-	},
-	
-	'cannotCreate': {
-		
-		trueButtonText: 'Отмена',
+		TrueButtonText: '',
 				
-		falseButtonText: '',
-		
-		extButtonText: 'Запись на другом устройстве',
+		FalseButtonText: '',
 				
-		questionText: 'В данном проекте, запись разговора с респондентом будет включена автоматически в момент открытия анкеты.<p><b>Для этого нужно разрешение на запись аудио.</b> Разрешите доступ к микрофону и обновите страницу.</p><p>В случае выбора записи на другом устройстве, файл записи нужно будет прислать отдельно</p><p><b>Без файла записи анкета не будет принята!</b></p>'
+		TitleText: 'Запрос на вход отклонён'
 		
 	},
 	
-	'authError': {
+	'SinglePrompt': {
 		
-		trueButtonText: '',
-				
-		falseButtonText: '',
-				
-		questionText: 'Не заполнены данные для авторизации'
+		DialogType: 'prompt',
 		
-	},
-	
-	'login_error': {
-		
-		trueButtonText: '',
+		TrueButtonText: 'Записать',
 				
-		falseButtonText: '',
+		FalseButtonText: 'Отмена',
 				
-		questionText: 'Запрос на вход отклонён'
-		
-	},
-	
-	'notSend': {
-		
-		trueButtonText: '',
-				
-		falseButtonText: '',
-				
-		questionText: 'Что-то пошло не так. Повторите отправку позже.'
-		
-	},
-	
-	'notServer': {
-		
-		trueButtonText: '',
-				
-		falseButtonText: '',
-				
-		questionText: 'Произошла ошибка. Перезагрузите страницу и попробуйте ещё раз.'
+		TitleText: 'Впишите ответ'
 		
 	}
 	
 }
 
-class ConfirmDialog {
+class Dialog {
 
-	constructor({ 
-	
-		questionText, 
-		
-		trueButtonText, 
-		
-		falseButtonText, 
-		
-		extButtonText, 
-		
-		parent }) {
-	  
-		this.questionText = questionText || '';
-		
-		this.trueButtonText = trueButtonText || 'ОК';
-		
-		this.falseButtonText = falseButtonText || '';
-		
-		this.extButtonText = extButtonText || '';
-		
-		this.parent = parent || document.body;
+	constructor({
 
-		this.dialog = undefined;
-		
-		this.trueButton = undefined;
-		
-		this.falseButton = undefined;
+		TitleText,
 
-		this._createDialog();
+		TrueButtonText, 
+		
+		FalseButtonText, 
+		
+		ExtButtonText, 
+		
+		Parent,
+		
+		DialogType,
+		
+		Custom
+		
+	}) {
+		
+		this.DialogType = DialogType || '';
+		
+		this.TitleText = TitleText || '';
+
+		this.TrueButtonText = TrueButtonText || 'ОК';
+		
+		this.FalseButtonText = FalseButtonText || '';
+		
+		this.ExtButtonText = ExtButtonText || '';
+		
+		this.Custom = Custom || '';
+		
+		this.Parent = Parent || document.body;
+
+		this.Dialog = undefined;
+		
+		this.TrueButton = undefined;
+		
+		this.FalseButton = undefined;
+
+		if (this.DialogType == 'confirm') this._createConfirmDialog();
+		
+		if (this.DialogType == 'prompt') this._createPromptDialog();
+		
+		if (this.DialogType == 'custom') this._createCustomDialog();
 		
 		this._appendDialog();
 	
@@ -114,7 +92,7 @@ class ConfirmDialog {
 	  
 		return new Promise((resolve, reject) => {
 			
-			const somethingWentWrongUponCreation = ! this.dialog || ! this.trueButton || ! this.falseButton;
+			const somethingWentWrongUponCreation = ! this.Dialog || ! this.TrueButton || ! this.FalseButton;
 		  
 			if (somethingWentWrongUponCreation) {
 			  
@@ -124,17 +102,17 @@ class ConfirmDialog {
 			
 			}
 
-			this.dialog.showModal();
+			this.Dialog.showModal();
 
-			this.trueButton.addEventListener("click", () => {
+			this.TrueButton.addEventListener('click', () => {
 			  
-				resolve(true);
+				resolve(this.PromptInput || this.Custom.querySelector('input') || true);
 			
 				this._destroy();
 			
 			});
 
-			this.falseButton.addEventListener("click", () => {
+			this.FalseButton.addEventListener('click', () => {
 			  
 				resolve(false);
 			
@@ -142,7 +120,7 @@ class ConfirmDialog {
 			
 			});
 			
-			this.extButton.addEventListener("click", () => {
+			this.extButton.addEventListener('click', () => {
 			  
 				resolve('ext');
 			
@@ -154,19 +132,57 @@ class ConfirmDialog {
 	
 	}
 
-	_createDialog() {
+	_createConfirmDialog() {
 	  
-		this.dialog = elem('dialog', {classname: 'confirm-dialog'});
+		this.Dialog = elem('Dialog', {classname: 'confirm-dialog'});
 
-		const question = elem('div', {classname: 'confirm-dialog-question', innerhtml: this.questionText});
+		this.Title = elem('div', {classname: 'dialog-title', innerhtml: this.TitleText});
 		
-		this.dialog.appendChild(question);
+		this.Dialog.appendChild(this.Title);
 
-		const buttonGroup = elem('div', {classname: 'confirm-dialog-button-group'});
+		const buttonGroup = elem('div', {classname: 'dialog-button-group'});
 		
-		this.dialog.appendChild(buttonGroup);
+		this.Dialog.appendChild(buttonGroup);
 		
-		this.extButton = elem('button', {classname: 'confirm-dialog-button confirm-dialog-button--ext', type: 'button', textcontent: this.extButtonText});
+		this.extButton = elem('button', {classname: 'dialog-button dialog-button--ext', type: 'button', textcontent: this.ExtButtonText});
+		
+		buttonGroup.appendChild(this.extButton);
+		
+		this.divider1 = elem('span', {classname: 'Dialog-divider'});
+		
+		buttonGroup.appendChild(this.divider1);
+
+		this.FalseButton = elem('button', {classname: 'dialog-button dialog-button--false', type: 'button', textcontent: this.FalseButtonText});
+		
+		buttonGroup.appendChild(this.FalseButton);
+		
+		this.divider2 = elem('span', {classname: 'Dialog-divider'});
+		
+		buttonGroup.appendChild(this.divider2);
+		
+		this.TrueButton = elem('button', {classname: 'dialog-button dialog-button--true', type: 'button', textcontent: this.TrueButtonText});
+		
+		buttonGroup.appendChild(this.TrueButton);
+
+	}
+	
+	_createPromptDialog() {
+	  
+		this.Dialog = elem('Dialog', {classname: 'prompt-dialog'});
+
+		this.Title = elem('div', {classname: 'dialog-title', innerhtml: this.TitleText});
+		
+		this.Dialog.appendChild(this.Title);
+		
+		this.PromptInput = elem('textarea', {classname: 'prompt-dialog-textarea'});
+		
+		this.Dialog.appendChild(this.PromptInput);
+
+		const buttonGroup = elem('div', {classname: 'dialog-button-group'});
+		
+		this.Dialog.appendChild(buttonGroup);
+		
+		this.extButton = elem('button', {classname: 'dialog-button dialog-button--ext', type: 'button', textcontent: this.ExtButtonText});
 		
 		buttonGroup.appendChild(this.extButton);
 		
@@ -174,29 +190,77 @@ class ConfirmDialog {
 		
 		buttonGroup.appendChild(this.divider1);
 
-		this.falseButton = elem('button', {classname: 'confirm-dialog-button confirm-dialog-button--false', type: 'button', textcontent: this.falseButtonText});
+		this.FalseButton = elem('button', {classname: 'dialog-button dialog-button--false', type: 'button', textcontent: this.FalseButtonText});
 		
-		buttonGroup.appendChild(this.falseButton);
+		buttonGroup.appendChild(this.FalseButton);
 		
 		this.divider2 = elem('span', {classname: 'dialog-divider'});
 		
 		buttonGroup.appendChild(this.divider2);
 		
-		this.trueButton = elem('button', {classname: 'confirm-dialog-button confirm-dialog-button--true', type: 'button', textcontent: this.trueButtonText});
+		this.TrueButton = elem('button', {classname: 'dialog-button dialog-button--true', type: 'button', textcontent: this.TrueButtonText});
 		
-		buttonGroup.appendChild(this.trueButton);
+		buttonGroup.appendChild(this.TrueButton);
+		
+		this.PromptInput.focus();
+
+	}
+	
+	_createCustomDialog() {
+	  
+		this.Dialog = elem('Dialog', {classname: 'custom-dialog'});
+
+		this.Title = elem('div', {classname: 'dialog-title', innerhtml: this.TitleText});
+		
+		this.Dialog.appendChild(this.Title);
+		
+		this.Dialog.appendChild(this.Custom);
+
+		this.Custom.classList.remove('hidden');
+
+		this.Dialog.appendChild(this.Custom);
+
+		const buttonGroup = elem('div', {classname: 'dialog-button-group'});
+		
+		this.Dialog.appendChild(buttonGroup);
+		
+		this.extButton = elem('button', {classname: 'dialog-button dialog-button--ext', type: 'button', textcontent: this.ExtButtonText});
+		
+		buttonGroup.appendChild(this.extButton);
+		
+		this.divider1 = elem('span', {classname: 'dialog-divider'});
+		
+		buttonGroup.appendChild(this.divider1);
+
+		this.FalseButton = elem('button', {classname: 'dialog-button dialog-button--false', type: 'button', textcontent: this.FalseButtonText});
+		
+		buttonGroup.appendChild(this.FalseButton);
+		
+		this.divider2 = elem('span', {classname: 'dialog-divider'});
+		
+		buttonGroup.appendChild(this.divider2);
+		
+		this.TrueButton = elem('button', {classname: 'dialog-button dialog-button--true', type: 'button', textcontent: this.TrueButtonText});
+		
+		buttonGroup.appendChild(this.TrueButton);
+		
+		if (this.Custom.querySelector('input')) this.Custom.querySelector('input').addEventListener('keyup', (e) => {
+			
+			if (/Enter|NumpadEnter/.test(e.code)) this.TrueButton.click();
+			
+		});
 
 	}
 
 	_appendDialog() {
 		  
-		this.parent.appendChild(this.dialog);
+		this.Parent.appendChild(this.Dialog);
 		
 	}
 
 	_destroy() {
 	  
-		this.parent.removeChild(this.dialog);
+		this.Parent.removeChild(this.Dialog);
 		
 		delete this;
 	
@@ -204,86 +268,50 @@ class ConfirmDialog {
   
 }
 
-async function al(e) {
-	
-	let id = typeof(e.target) != 'undefined' ? e.target.id : e;
-	
-	switch (id) {
+async function CreateDialog(type, title = false, custom = false, ext = false) {
+
+	switch (type) {
+
+		case 'LoginError':
 		
-		case 'rec_alert':
-		
-			const dialog1 = new ConfirmDialog(dialogData[id]);
+			const LoginErrorDialog = new Dialog(dialogData[type]);
 			
-			await dialog1.confirm();
+			await LoginErrorDialog.confirm();
 		
 		break;
 		
-		case 'button_new':
+		case 'AuthError':
 		
-			const dialog2 = new ConfirmDialog(recordPermission ? dialogData.canCreate : dialogData.cannotCreate);
+			const AuthErrorDialog = new Dialog(dialogData[type]);
 			
-			if (recordPermission) {
-				
-				const canCreateNew = await dialog2.confirm();
-				
-				if (canCreateNew) anStart();
-				
-			} else {
-				
-				const oDevice = await dialog2.confirm();
-				
-				if (oDevice == 'ext') anStart(false);
-				
-			}
+			await AuthErrorDialog.confirm();
 		
 		break;
 		
-		case 'login_error':
+		case 'SinglePrompt':
 		
-			const dialog3 = new ConfirmDialog(dialogData[id]);
+			const SinglePromptDialog = new Dialog(dialogData[type]);
 			
-			await dialog3.confirm();
+			PROMPTRESULT = await SinglePromptDialog.confirm();
 		
 		break;
 		
-		case 'authError':
+		case 'ModalDialog':
 		
-			const dialog5 = new ConfirmDialog(dialogData[id]);
+			const ModalDialog = new Dialog({DialogType: 'confirm', 'QuestionText': title});
 			
-			await dialog5.confirm();
+			await ModalDialog.confirm();
 		
 		break;
 		
-		case 'button_resume':
+		case 'CustomDialog':
 		
-			const dialog4 = new ConfirmDialog(dialogData[id]);
+			const CustomDialog = new Dialog({DialogType: 'custom', TitleText: title, Custom: custom, FalseButtonText: 'Отмена', ExtButtonText: ext});
 			
-			const canResume = await dialog4.confirm();
-			
-			if (canResume) {
-				
-				LA = e.target.dataset.an;
-				
-				if (/4|5/.test(AN[LP][LA].condition)) {
-				
-					LI = AN[LP][LA].sti;
-						
-					LV = AN[LP][LA].lv1;
-						
-					EVG = AN[LP][LA].evg;
-					
-					L.next(LI);
-						
-					wm(1, false);
-						
-					if (RL[LP].hasOwnProperty(LV) && RL[LP][LV][0].activity == 'vis') rule(LV);
-						
-				}
-				
-			}
+			CUSTOMRESULT = await CustomDialog.confirm();
 		
 		break;
-		
+
 	}
 	
 }

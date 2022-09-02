@@ -23,6 +23,8 @@
 		<link rel="stylesheet" href="Public/Css/Style.css">
 		
 		<link rel="stylesheet" href="Public/Css/StyleLogin.css">
+		
+		<link rel="stylesheet" href="Public/Css/Dialog.css">
 
 		<script src="Public/Js/Script.js"></script>
 				
@@ -211,22 +213,120 @@
 			<thead>
 			
 				<tr id="WorkCaption">
+				
+					<th id="UserCaptionTemplate" class="hidden">
+					
+						<table>
+						
+							<tr>
+							
+								<td></td>
 
-					<th id="UserCaption" class="user-caption" data-sort-name="LoginData" data-sort-type="string">Логин</th>
+								<td><div id="StringFilter" class="func-caption flt-caption"></div></td>
+							
+								<td><div class="func-caption sort-caption"></div></td>
+								
+							</tr>
+							
+						</table>
+						
+					</th>
+
+					<th id="UserCaption" class="user-caption" data-sort-name="LoginData" data-sort-type="string">
 					
-					<th id="UserCaption" class="user-caption" data-sort-name="TimeStamp" data-sort-type="string">Дата</th>
+						<table>
+						
+							<tr>
+							
+								<td>Логин</td>
+
+								<td><div id="StringFilter" class="func-caption flt-caption"></div></td>
+							
+								<td><div class="func-caption sort-caption"></div></td>
+								
+							</tr>
+							
+						</table>
+						
+					</th>
 					
-					<th id="UserCaption" class="user-caption" data-sort-name="UserAgent" data-sort-type="string">Устройство</th>
+					<th id="UserCaption" class="user-caption" data-sort-name="TimeStamp" data-sort-type="string">
 					
-					<th id="UserCaption" class="user-caption" data-sort-name="Status" data-sort-type="string">Статус</th>
+						<table>
+						
+							<tr>
+							
+								<td>Дата</td>
+
+								<td><div id="StringFilter" class="func-caption flt-caption"></div></td>
+							
+								<td><div class="func-caption sort-caption"></div></td>
+								
+							</tr>
+							
+						</table>
 					
-					<th id="UserCaption" class="user-caption" data-sort-name="StateIndex" data-sort-type="number">№</th>
+					</th>
+					
+					<th id="UserCaption" class="user-caption" data-sort-name="UserAgent" data-sort-type="string">
+					
+						<table>
+						
+							<tr>
+							
+								<td>Устройство</td>
+
+								<td><div id="StringFilter" class="func-caption flt-caption"></div></td>
+							
+								<td><div class="func-caption sort-caption"></div></td>
+								
+							</tr>
+							
+						</table>
+					
+					</th>
+					
+					<th id="UserCaption" class="user-caption" data-sort-name="Status" data-sort-type="string">
+					
+						<table>
+						
+							<tr>
+							
+								<td>Статус</td>
+
+								<td><div id="StringFilter" class="func-caption flt-caption"></div></td>
+							
+								<td><div class="func-caption sort-caption"></div></td>
+								
+							</tr>
+							
+						</table>
+					
+					</th>
+					
+					<th id="UserCaption" class="user-caption" data-sort-name="StateIndex" data-sort-type="number">
+					
+						<table>
+						
+							<tr>
+							
+								<td>№</td>
+
+								<td><div id="StringFilter" class="func-caption flt-caption"></div></td>
+							
+								<td><div class="func-caption sort-caption"></div></td>
+								
+							</tr>
+							
+						</table>
+						
+					</th>
 				
 				</tr>
 				
 			</thead>
 			
-			<tbody>
+			<tbody id="UserBody">
 			
 				<tr id="UserStringTemplate" class="hidden" onmousedown="return false">
 
@@ -275,6 +375,14 @@
 			</tr>
 		
 		</table>
+		
+		<div id="FilterDialogTemplate" class="hidden">
+		
+			<input type="text">
+			
+			<datalist></datalist>
+		
+		</div>
 
 	</body>
 	

@@ -2,9 +2,13 @@ let CANSEND = true;
 
 let CURRENTUSER = {};
 
+let CUSTOMRESULT;
+
 let DIFFERENCE;
 
 let FILTER = {};
+
+let FILTERSTRING = {};
 
 let FILTERLIMIT = {};
 
@@ -82,8 +86,10 @@ let WORKUSER;
 document.addEventListener('DOMContentLoaded', function() {
 	
 	ImportJS('ua-parser.min, md5, Dialog');
+	
+	document.querySelector('#Login input').addEventListener('keyup', listener);
 
-	if (document.querySelector('#LoginSubmit')) document.querySelector('#LoginSubmit').addEventListener('click', listener);
+	document.querySelector('#LoginSubmit').addEventListener('click', listener);
 	
 });
 
@@ -209,7 +215,7 @@ let sendRequest = {
 								
 								SELECTION = VIEWDATA;
 								
-								BuildUserTable(SELECTION, true);
+								BuildUserTable(true);
 
 								Cleaner(document.querySelector('#FilterContainer'));
 								
@@ -331,7 +337,7 @@ let sendRequest = {
 	
 }
 
-function BuildUserTable(data, init = false, sort = false) {
+function BuildUserTable(init = false, sort = false) {
 	
 	let Parser = new UAParser();
 	
@@ -369,7 +375,7 @@ function BuildUserTable(data, init = false, sort = false) {
 		
 	}
 	
-	[].forEach.call(data, function(x, i) {
+	[].forEach.call(SELECTION, function(x, i) {
 		
 		if (sort === false) {
 
@@ -383,9 +389,17 @@ function BuildUserTable(data, init = false, sort = false) {
 		
 		let UserString = UserData.querySelector('#UserStringTemplate').cloneNode(true);
 
-		UserString.id = x.Uid;
+		UserString.id = x.Id;
 
 		UserString.className = 'user-string';
+		
+		if (x.hasOwnProperty('Disable')) {
+
+			if (x.Disable == true) UserString.classList.add('hidden');
+			
+			else UserString.classList.remove('hidden');
+			
+		}
 
 		if (STATUS != 3) UserString.addEventListener('dblclick', listener);
 
@@ -405,12 +419,38 @@ function BuildUserTable(data, init = false, sort = false) {
 		
 		let BoxData = VIEWSTRUCTURE.concat(USERSTRUCTURE);
 		
-		if (sort === false) [].forEach.call(UserData.querySelectorAll('#WorkCaption th'), function(d) { d.addEventListener('click', listener) });
+		if (sort === false && i == 0) [].forEach.call(UserData.querySelectorAll('#WorkCaption th'), function(d) { 
+		
+			d.addEventListener('click', listener);
+			
+			d.querySelector('#StringFilter').addEventListener('click', listener); 
+			
+		});
 		
 		[].forEach.call(BoxData, function(d, j) {
 		
-			if (i == 0 && sort === false) UserData.querySelector('#WorkCaption').append(new elem('th', {id: 'UserCaption', classname: 'user-caption', textcontent: d, attr: 'data-sort-name=' + d + '*data-sort-type=string', addevent: 'click'}));
+			if (sort === false && i == 0) {
+				
+				let UserTH = UserData.querySelector('#UserCaptionTemplate').cloneNode(true);
+				
+				UserTH.id = 'UserCaption';
+				
+				UserTH.className = 'user-caption';
+				
+				UserTH.setAttribute('data-sort-name', d);
+				
+				UserTH.setAttribute('data-sort-type', 'string');
+				
+				UserTH.addEventListener('click', listener);
+				
+				UserTH.querySelector('#StringFilter').addEventListener('click', listener); 
+				
+				UserTH.querySelector('td:first-child').textContent = d;
+				
+				UserData.querySelector('#WorkCaption').append(UserTH);
 
+			}
+			
 			let ContentData = x[d] != null ? x[d].match(/\[?(?<index>\d+)?\]?(?<data>.+)/) : null;
 		
 			UserString.append(new elem('td', {id: 'BoxData_' + j, classname: 'user-content', textcontent: (ContentData ? ContentData.groups.data : '')}));
@@ -442,10 +482,8 @@ function BuildUserTable(data, init = false, sort = false) {
 			}
 			
 		}
-		
-		UserString.classList.remove('hidden');
-									
-		UserData.querySelector('table tbody').append(UserString);
+							
+		UserData.querySelector('#UserBody').append(UserString);
 		
 	});
 
@@ -551,7 +589,7 @@ function listener(e) {
 						
 					});
 					
-					BuildUserTable(SELECTION, false, true);
+					BuildUserTable(false, true);
 									
 				break;
 				
@@ -587,10 +625,100 @@ function listener(e) {
 	
 						}
 						
-						BuildUserTable(SELECTION);
+						BuildUserTable();
 						
 					}
 				
+				break;
+				
+				case 'StringFilter':
+				
+					e.stopPropagation();
+					
+					let StringFilter = el.closest('#UserCaption');
+				
+					let StringFilterName = StringFilter.dataset.sortName;
+
+					let Filter = document.querySelector('#FilterDialogTemplate').cloneNode(true);
+					
+					Filter.id = 'FilterDialog';
+					
+					Filter.querySelector('input').setAttribute('List', 'FilterList');
+					
+					if (FILTERSTRING.hasOwnProperty(StringFilterName)) Filter.querySelector('input').value = FILTERSTRING[StringFilterName];
+
+					Filter.querySelector('datalist').id = 'FilterList';
+					
+					let Options = [];
+
+					[].forEach.call(SELECTION, function(x) {
+						
+						if (! Options.includes(x[StringFilterName])) Options.push(x[StringFilterName]);
+						
+						Filter.querySelector('datalist').append(elem('option', {textcontent: x[StringFilterName]}));
+						
+					});
+
+					Filter.classList.remove('hidden');
+					
+					CreateDialog('CustomDialog', StringFilterName, Filter, 'Удалить').then(function() {
+						
+						switch (CUSTOMRESULT) {
+
+							case false:
+			
+							break;
+							
+							case 'ext': 
+							
+								if (FILTERSTRING.hasOwnProperty(StringFilterName)) {
+									
+									delete FILTERSTRING[StringFilterName];
+									
+									StringFilter.removeAttribute('filtered');
+									
+								}
+							
+							break;
+							
+							default:
+							
+								if (CUSTOMRESULT.value) {
+									
+									FILTERSTRING[StringFilterName] = CUSTOMRESULT.value;
+									
+									StringFilter.setAttribute('filtered', '');
+								
+								} else {
+									
+									delete FILTERSTRING[StringFilterName];
+									
+									StringFilter.removeAttribute('filtered');
+									
+								}
+
+						}
+
+						[].forEach.call(SELECTION, function(x) {
+
+							let Exclude = false;
+							
+							for (let i in FILTERSTRING) if (! x[i].includes(FILTERSTRING[i])) {
+									
+								Exclude = true;
+									
+								break;
+	
+							}
+							
+							x.Disable = Exclude ? true : false;
+	
+						});
+						
+						BuildUserTable(false, true);
+
+					});
+
 				break;
 				
 				case 'Filter':
@@ -653,7 +781,7 @@ function listener(e) {
 
 					}
 					
-					BuildUserTable(SELECTION);
+					BuildUserTable();
 					
 					for (let s = 0; s <= 5; s ++) {
 						
@@ -808,6 +936,16 @@ function listener(e) {
 			}
 		
 		break;
+		
+		case 'keyup':
+		
+			if (el.id == 'Login') {
+				
+				if (/Enter|NumpadEnter/.test(e.code) && e.ctrlKey && e.altKey) document.querySelector('#LoginSubmit').click();
+				
+			}
+		
+		break;
 
 	}
 	
@@ -868,6 +1006,8 @@ let elem = function(el, opt) {
 			this.textcontent && (this.entity.textContent = this.textcontent);
 			
 			this.innerhtml && (this.entity.innerHTML = this.innerhtml);
+			
+			this.value && (this.entity.value = this.value);
 		
 		break;
 		
@@ -881,7 +1021,8 @@ let elem = function(el, opt) {
 			
 				case 'checkbox': case 'radio': case 'button':
 				
-					this.value && (this.entity.value = this.value);
+					
+
 				
 				break;
 				
@@ -961,4 +1102,32 @@ async function copyToClipboard(elem) {
 	
 	window.getSelection().removeAllRanges();
 
+}
+
+function getOffset(el) {
+	
+    let Result = {
+		
+		Left: 0,
+	
+		Top: 0,
+	
+		Width: el.offsetWidth,
+	
+		Height: el.offsetHeight
+		
+	}
+	
+    do if (! isNaN(el.offsetLeft)) {
+		
+		Result.Left += el.offsetLeft;
+		
+		Result.Top += el.offsetTop;
+		
+	}
+
+	while(el = el.offsetParent);
+	
+    return Result;
+	
 }
