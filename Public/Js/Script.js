@@ -4,8 +4,6 @@ let CURRENTUSER = {};
 
 let CUSTOMRESULT;
 
-let DIFFERENCE;
-
 let FILTER = {};
 
 let FILTERSTRING = {};
