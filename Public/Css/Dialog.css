@@ -1,0 +1,110 @@
+.prompt-dialog {
+	
+	width: fit-content;
+	border: none;
+	background-color: #555;
+	color: #fff;
+	min-height: 50px;
+	padding: 16px 40px;
+	border-radius: 3px;
+	
+}
+
+.custom-dialog {
+	
+	width: fit-content;
+	border: none;
+	background-color: #555;
+	color: #fff;
+	min-height: 50px;
+	padding: 16px 40px;
+	border-radius: 3px;
+	
+}
+
+.confirm-dialog {
+	
+	width: auto;
+    border: none;
+    top: unset;
+	background-color: #555;
+    color: #fff;
+	min-height: 50px;
+	padding: 16px 40px;
+	
+}
+
+.prompt-dialog::backdrop, .confirm-dialog::backdrop {
+	
+	background: transparent;
+	backdrop-filter: blur(1.5px);
+	
+}
+
+.prompt-dialog-textarea {
+	
+	width: 30vw;
+	margin-top: 15px;
+	border: none;
+	background-color: #555;
+	color: #fff;
+	
+}
+
+.prompt-dialog-textarea:focus {
+	
+    outline: none !important;	
+    border: none;
+	
+}
+
+.dialog-title {
+	
+	float: left;
+	justify-content: center;
+    align-items: normal;
+    display: flex;
+	flex-direction: column;
+	min-height: 50px;
+	
+}
+
+.button-group {
+	
+	display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+	
+}
+
+.dialog-button {
+	
+	background-color: transparent;
+    border: none;
+    color: #fff;
+    padding: 0;
+    height: 20px;
+    margin-top: 15px;
+	font-size: 110%;
+	cursor: pointer;
+	
+}
+
+.dialog-button:hover {
+	
+	color: #ff5900;
+	
+}
+
+.dialog-button::active {
+	
+	border-style: none;
+	
+}
+
+.dialog-divider {
+	
+	width: 60px;
+	display: inline-block;
+	
+}
