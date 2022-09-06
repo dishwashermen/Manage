@@ -841,7 +841,7 @@ function listener(e) {
 							
 							CopyStrng.append(new elem('td', {textcontent: f.querySelector('.filter-name-container').textContent}));
 							
-							CopyStrng.append(new elem('td', {textcontent: f.querySelector('.limit-container').textContent}));
+							CopyStrng.append(new elem('td', {textcontent: "'" + f.querySelector('.limit-container').textContent}));
 							
 							CopyContainer.append(CopyStrng);
 							
